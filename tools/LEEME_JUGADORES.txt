@@ -1,0 +1,20 @@
+﻿VELKARIS - La Guerra de los Tres Reinos
+=======================================
+
+CÓMO JUGAR CON TUS AMIGOS
+1. Doble clic en "Crear_acceso_directo.bat" para tener el icono en el Escritorio (opcional).
+2. Abre Velkaris.exe.
+3. Escribe tu nombre, elige reino y clase.
+4. En "Servidor" pon la IP que te pasó el anfitrión y en "Puerto" el suyo (por defecto 7777).
+   - Misma casa / misma red Wi-Fi: la IP local del anfitrión (ej. 192.168.1.35).
+   - Por Internet: la IP pública del anfitrión, o su IP de Tailscale/ZeroTier/Radmin VPN.
+5. Si el servidor tiene contraseña, escríbela. Pulsa "Unirse al servidor".
+
+Windows SmartScreen puede avisar porque el .exe no está firmado:
+"Más información" > "Ejecutar de todas formas".
+
+CONTROLES
+WASD mover · clic derecho/izquierdo + arrastrar girar cámara · Q/E girar · rueda zoom
+1, 2, 3 habilidades · Tab objetivo · Enter chat de reino · F1 ayuda · Esc menú
+
+Más información: https://github.com/LucianoColalunga/Velkaris

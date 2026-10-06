@@ -1,0 +1,29 @@
+; Configuración del servidor dedicado de Velkaris.
+; Cópialo como "server.cfg" junto a VelkarisServer.exe (el script de compilación lo hace solo).
+; Los argumentos de línea de comandos tienen prioridad: --port=7777 --password=xxx --max-players=32
+
+[server]
+
+; Nombre que verán los jugadores al conectarse.
+name="Servidor de Velkaris"
+
+; Puerto UDP. Es el que debes abrir en el firewall / reenviar en el router.
+port=7777
+
+max_players=32
+
+; Contraseña de acceso. Muy recomendada si expones el servidor a Internet.
+; La contraseña nunca viaja por la red: se usa un desafío-respuesta con SHA-256.
+password=""
+
+; Interfaz de red: "*" = todas. Usa la IP de tu VPN (p. ej. Tailscale) para escuchar solo ahí.
+bind_ip="*"
+
+; Diferencia máxima de jugadores entre el reino más poblado y el menos poblado.
+; 0 = sin límite (útil para probar con pocos amigos).
+realm_balance_margin=3
+
+[security]
+
+; Conexiones simultáneas permitidas desde una misma IP (varios amigos tras un mismo router).
+max_conn_per_ip=4

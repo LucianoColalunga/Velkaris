@@ -1,0 +1,16 @@
+# Godot 4
+.godot/
+/android/
+*.tmp
+export_credentials.cfg
+
+# Salida de compilación (se publica en GitHub Releases, no en el repositorio)
+build/
+
+# Configuración local del servidor: puede contener la contraseña. Se versiona server.cfg.example.
+server.cfg
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

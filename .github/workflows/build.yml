@@ -1,0 +1,61 @@
+# Compila Velkaris en la nube de GitHub y publica los .zip en Releases.
+#  - Manual: pestaña Actions > "Build" > Run workflow  (descarga el resultado en "Artifacts").
+#  - Release: git tag v0.1.0 && git push origin v0.1.0  (crea la Release con los .zip).
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+env:
+  GODOT_VERSION: "4.3"
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar plantillas de exportación
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Importar proyecto
+        run: godot --headless --import
+
+      - name: Exportar cliente y servidores
+        run: |
+          mkdir -p build/windows build/server build/linux-server
+          godot --headless --export-release "Windows Desktop" build/windows/Velkaris.exe
+          godot --headless --export-release "Windows Server" build/server/VelkarisServer.exe
+          godot --headless --export-release "Linux Server" build/linux-server/velkaris_server.x86_64
+          cp tools/crear_acceso_directo.ps1 tools/Crear_acceso_directo.bat tools/LEEME_JUGADORES.txt build/windows/
+          cp tools/iniciar_servidor.bat tools/abrir_puerto_firewall.ps1 build/server/
+          cp server.cfg.example build/server/server.cfg
+          cp server.cfg.example build/linux-server/server.cfg
+          test -f build/windows/Velkaris.exe && test -f build/server/VelkarisServer.exe
+
+      - name: Empaquetar
+        run: |
+          command -v zip >/dev/null || (apt-get update && apt-get install -y zip)
+          cd build/windows && zip -r ../Velkaris-Windows-x64.zip . && cd ../..
+          cd build/server && zip -r ../Velkaris-Server-Windows-x64.zip . && cd ../..
+          cd build/linux-server && zip -r ../Velkaris-Server-Linux-x64.zip . && cd ../..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: velkaris-builds
+          path: build/*.zip
+
+      - name: Publicar Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.zip
