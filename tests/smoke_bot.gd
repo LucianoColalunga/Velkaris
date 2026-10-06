@@ -84,6 +84,12 @@ func _process(delta: float) -> void:
 
 
 func _shot(label: String) -> void:
+	print("[BOT] Rendimiento (%s): %d FPS, %d draw calls, %d objetos, %d primitivas, %.0f MB RAM estática" % [
+		label, Performance.get_monitor(Performance.TIME_FPS),
+		Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+		Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),
+		Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+		Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0])
 	if shots_dir == "":
 		return
 	await RenderingServer.frame_post_draw
