@@ -181,7 +181,7 @@ func on_ready(id: int) -> void:
 	players[id] = p
 	_respawn(p)
 	Net.s2c_welcome.rpc_id(id, {"id": id, "server": cfg.server_name, "realm": p.realm,
-		"cls": p.cls, "roster": _roster()})
+		"cls": p.cls, "roster": _roster(), "pos": [p.pos.x, p.pos.y], "yaw": p.yaw})
 	_broadcast_event(Protocol.Ev.ROSTER, [[p.id, p.name, p.realm, p.cls]], id)
 	_broadcast_system("%s se une a %s como %s." % [p.name, GameData.REALM_SHORT[p.realm], GameData.CLASS_NAMES[p.cls]])
 	_log("  (id %d, IP %s, %d jugadores en línea)" % [id, p.ip, players.size()])

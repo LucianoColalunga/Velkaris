@@ -33,11 +33,11 @@ jobs:
       - name: Exportar cliente y servidores
         run: |
           mkdir -p build/windows build/server build/linux-server
-          godot --headless --export-release "Windows Desktop" build/windows/Velkaris.exe
-          godot --headless --export-release "Windows Server" build/server/VelkarisServer.exe
-          godot --headless --export-release "Linux Server" build/linux-server/velkaris_server.x86_64
-          cp tools/crear_acceso_directo.ps1 tools/Crear_acceso_directo.bat tools/LEEME_JUGADORES.txt build/windows/
-          cp tools/iniciar_servidor.bat tools/abrir_puerto_firewall.ps1 build/server/
+          godot --headless --export-release "Windows Desktop" build/windows/Velkaris.exe || true
+          godot --headless --export-release "Windows Server" build/server/VelkarisServer.exe || true
+          godot --headless --export-release "Linux Server" build/linux-server/velkaris_server.x86_64 || true
+          cp icon.ico tools/crear_acceso_directo.ps1 tools/Crear_acceso_directo.bat tools/LEEME_JUGADORES.txt build/windows/
+          cp icon.ico tools/iniciar_servidor.bat tools/abrir_puerto_firewall.ps1 build/server/
           cp server.cfg.example build/server/server.cfg
           cp server.cfg.example build/linux-server/server.cfg
           test -f build/windows/Velkaris.exe && test -f build/server/VelkarisServer.exe

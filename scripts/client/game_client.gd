@@ -146,6 +146,12 @@ func on_welcome(data: Variant) -> void:
 	my_max_hp = GameData.CLASS_MAX_HP[my_cls]
 	my_hp = my_max_hp
 	server_name = str(d.get("server", server_name))
+	# Posición de aparición: sin ella, el cliente predeciría desde (0, 0) hasta el primer snapshot.
+	var spawn: Variant = d.get("pos")
+	if typeof(spawn) == TYPE_ARRAY and spawn.size() == 2:
+		pred_pos = Vector2(spawn[0], spawn[1])
+		prev_pos = pred_pos
+	my_yaw = float(d.get("yaw", 0.0))
 	var r: Variant = d.get("roster", [])
 	if typeof(r) == TYPE_ARRAY:
 		_apply_roster(r)
@@ -476,6 +482,7 @@ func _build_world() -> void:
 	add_child(me_avatar)
 	me_avatar.setup(my_name, my_realm, my_cls, true)
 	camera_rig = CameraRig.new()
+	camera_rig.yaw = my_yaw  # Aparecer mirando hacia el Bastión.
 	add_child(camera_rig)
 	var layer := CanvasLayer.new()
 	add_child(layer)

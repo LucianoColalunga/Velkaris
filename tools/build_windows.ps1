@@ -32,6 +32,33 @@ $Build = Join-Path $ProjectRoot 'build'
 function Write-Step([string]$Msg) { Write-Host "`n==> $Msg" -ForegroundColor Cyan }
 function Stop-Build([string]$Msg) { Write-Host "`nERROR: $Msg" -ForegroundColor Red; exit 1 }
 
+# rcedit: Godot 4.3 lo usa para incrustar el icono y la version en el .exe. Si esta en el PATH,
+# Godot lo encuentra solo. Se descarga una version fija y se verifica su SHA-256.
+$RceditUrl = 'https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe'
+$RceditSha256 = '3E7801DB1A5EDBEC91B49A24A094AAD776CB4515488EA5A4CA2289C400EADE2A'
+
+function Enable-Rcedit {
+    $dir = Join-Path $Build '.tools'
+    $exe = Join-Path $dir 'rcedit.exe'
+    if (-not (Test-Path $exe)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $RceditUrl -OutFile $exe -UseBasicParsing
+        } catch {
+            Write-Host "    No se pudo descargar rcedit: el .exe tendra el icono generico de Godot." -ForegroundColor Yellow
+            return
+        }
+    }
+    if ((Get-FileHash $exe -Algorithm SHA256).Hash -ne $RceditSha256) {
+        Remove-Item $exe -Force
+        Write-Host '    rcedit descargado no coincide con el hash esperado; se descarta.' -ForegroundColor Yellow
+        return
+    }
+    $env:PATH = "$dir;$env:PATH"
+    Write-Host "    rcedit listo (icono y version del .exe)."
+}
+
 function Find-Godot([string]$Hint) {
     $candidates = New-Object System.Collections.Generic.List[string]
     if ($Hint) { $candidates.Add($Hint) }
@@ -97,6 +124,9 @@ if (-not $tplDir) {
 if ($Linux -and -not (Test-Path (Join-Path $tplDir 'linux_release.x86_64'))) { Stop-Build 'Las plantillas no incluyen Linux.' }
 
 # --- 3. Importar y exportar ------------------------------------------------------------------
+Write-Step 'Preparando rcedit (icono del .exe)'
+Enable-Rcedit
+
 Write-Step 'Importando recursos del proyecto (la primera vez tarda un poco)'
 $null = Invoke-Godot $godot "--headless --path `"$ProjectRoot`" --import" 600
 
@@ -106,6 +136,7 @@ $clientExe = Join-Path $clientDir 'Velkaris.exe'
 New-Item -ItemType Directory -Force -Path $clientDir | Out-Null
 $code = Invoke-Godot $godot "--headless --path `"$ProjectRoot`" --export-release `"Windows Desktop`" `"$clientExe`"" 600
 if (-not (Test-Path $clientExe)) { Stop-Build "La exportacion del cliente fallo (codigo $code). Revisa los mensajes de arriba." }
+Copy-Item (Join-Path $ProjectRoot 'icon.ico') $clientDir -Force
 Copy-Item (Join-Path $ToolsDir 'crear_acceso_directo.ps1') $clientDir -Force
 Copy-Item (Join-Path $ToolsDir 'Crear_acceso_directo.bat') $clientDir -Force
 Copy-Item (Join-Path $ToolsDir 'LEEME_JUGADORES.txt') $clientDir -Force
@@ -116,6 +147,7 @@ $serverExe = Join-Path $serverDir 'VelkarisServer.exe'
 New-Item -ItemType Directory -Force -Path $serverDir | Out-Null
 $code = Invoke-Godot $godot "--headless --path `"$ProjectRoot`" --export-release `"Windows Server`" `"$serverExe`"" 600
 if (-not (Test-Path $serverExe)) { Stop-Build "La exportacion del servidor fallo (codigo $code)." }
+Copy-Item (Join-Path $ProjectRoot 'icon.ico') $serverDir -Force
 Copy-Item (Join-Path $ToolsDir 'iniciar_servidor.bat') $serverDir -Force
 Copy-Item (Join-Path $ToolsDir 'abrir_puerto_firewall.ps1') $serverDir -Force
 $serverCfg = Join-Path $serverDir 'server.cfg'
@@ -136,7 +168,7 @@ if (-not $NoShortcut) {
     Write-Step 'Creando accesos directos en el Escritorio'
     & (Join-Path $ToolsDir 'crear_acceso_directo.ps1') -ExePath $clientExe -Name 'Velkaris'
     & (Join-Path $ToolsDir 'crear_acceso_directo.ps1') -ExePath (Join-Path $serverDir 'iniciar_servidor.bat') `
-        -Name 'Velkaris - Servidor' -IconPath $serverExe
+        -Name 'Velkaris - Servidor' -IconPath (Join-Path $serverDir 'icon.ico')
 }
 
 # --- 5. Paquetes para GitHub Releases -------------------------------------------------------

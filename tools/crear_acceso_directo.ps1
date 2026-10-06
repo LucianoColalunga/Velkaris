@@ -13,7 +13,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $target = (Resolve-Path $ExePath).Path
-$icon = if ($IconPath) { (Resolve-Path $IconPath).Path } else { $target }
+# Icono: el indicado, o icon.ico junto al ejecutable, o el icono incrustado en el propio .exe.
+$localIco = Join-Path (Split-Path -Parent $target) 'icon.ico'
+$icon = if ($IconPath) { (Resolve-Path $IconPath).Path } elseif (Test-Path $localIco) { $localIco } else { $target }
 # GetFolderPath respeta el Escritorio redirigido por OneDrive.
 $desktop = [Environment]::GetFolderPath('Desktop')
 $lnkPath = Join-Path $desktop "$Name.lnk"

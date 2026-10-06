@@ -329,6 +329,21 @@ Resumen (detalle completo en [`docs/ARQUITECTURA_Y_SEGURIDAD.md`](docs/ARQUITECT
 - **Conexión:** desafío-respuesta con nonce, comparación en tiempo constante, bloqueo de IP,
   `server_relay` desactivado y decodificación de objetos desactivada.
 
+### Prueba automática (smoke test)
+[`tests/smoke_bot.gd`](tests/smoke_bot.gd) levanta un bot que se autentica con contraseña, camina
+desde su santuario hasta el Portón Norte (la muralla debe frenarlo) y lo golpea. Con el servidor
+corriendo en otra consola:
+
+```bash
+godot --headless --path . -- --server --port=7790 --password=prueba
+```
+
+```bash
+godot --headless --path . res://tests/smoke_bot.tscn -- --port=7790 --password=prueba
+```
+
+Termina con `RESULTADO: OK` (código 0) si todo funciona.
+
 ## Hoja de ruta
 - [ ] Cifrado DTLS del tráfico ENet
 - [ ] Cuentas persistentes y base de datos de la campaña

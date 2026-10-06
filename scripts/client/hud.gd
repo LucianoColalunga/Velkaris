@@ -410,3 +410,12 @@ func _panel() -> PanelContainer:
 func _place(c: Control, preset: Control.LayoutPreset, margin: int = 10) -> void:
 	add_child(c)
 	c.set_anchors_and_offsets_preset(preset, Control.PRESET_MODE_MINSIZE, margin)
+	# Que el panel crezca hacia dentro de la pantalla cuando cambie su contenido.
+	if preset == Control.PRESET_CENTER_TOP or preset == Control.PRESET_CENTER_BOTTOM or preset == Control.PRESET_CENTER:
+		c.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	elif preset == Control.PRESET_TOP_RIGHT:
+		c.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	if preset == Control.PRESET_CENTER_BOTTOM or preset == Control.PRESET_BOTTOM_LEFT:
+		c.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	elif preset == Control.PRESET_CENTER:
+		c.grow_vertical = Control.GROW_DIRECTION_BOTH
